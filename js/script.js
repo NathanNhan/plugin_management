@@ -92,4 +92,68 @@ jQuery(document).ready(function() {
     })
 
 
+    //Add author 
+    jQuery("#frmAddAuthor").validate({
+        submitHandler: function() {
+            var data_author = "param=add_author&"+ jQuery('#frmAddAuthor').serialize();
+            var data = {
+                action : 'myauthor',
+                data: data_author
+            }
+            jQuery.post(mybookajaxurl.baseURL, data, function(response) {
+                var data = jQuery.parseJSON(response);
+                if(data.status == 1) {
+                    jQuery.notifyBar({
+                        cssClass: "success",
+                        html : data.message
+                    });
+                    
+                    setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                   
+                }
+               })
+        }
+    })
+
+
+    //Add Student 
+    jQuery("#frmAddStudent").validate({
+        submitHandler: function() {
+            var data_student = "param=add_student&"+ jQuery('#frmAddStudent').serialize();
+            var data = {
+                action : 'mystudent',
+                data: data_student
+            }
+            jQuery.post(mybookajaxurl.baseURL, data, function(response) {
+                var data = jQuery.parseJSON(response);
+                if(data.status == 1) {
+                    jQuery.notifyBar({
+                        cssClass: "success",
+                        html : data.message
+                    });
+                    
+                    setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                   
+                } else {
+                    jQuery.notifyBar({
+                        cssClass: "error",
+                        html : data.message
+                    });
+                    
+                    setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                }
+               })
+        }
+    })
+
+
+    //List student
+
+
 })

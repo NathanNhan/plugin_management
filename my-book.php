@@ -34,14 +34,11 @@
             add_action('admin_enqueue_scripts', array($this, 'load_assets'));
             //Khởi tạo menu in admin
             add_action('admin_menu', array($this, 'mybook_setting'));
-            
-
-            
         }
         //Nhúng thư viện scripts và css
         function load_assets() {
             $pages_include = array('list-book','add-book','edit-book','list-authors','add-author','list-students','add-student','course-tracker');
-            $currentPage = $_GET['page'];
+            $currentPage = isset($_GET['page']);
 
             if(in_array($currentPage, $pages_include)) {
                 wp_enqueue_style( 'bootstrap', PLUGIN_URL.'css/bootstrap.min.css', '', VERSION, 'all' );
@@ -83,7 +80,7 @@
             include_once PLUGIN_PATH.'/views/author_list.php';
         }
         function author_add () {
-            include_once PLUGIN_PATH.'/views/author_list.php';
+            include_once PLUGIN_PATH.'/views/author_add.php';
         }
         //Giao diện students 
         function list_students() {
@@ -116,57 +113,20 @@
         //Tạo database khi active plugin
         function create_table_plugin_book() {
             require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-            $sql = "CREATE TABLE `wp_my_books` (
-                `id` int NOT NULL AUTO_INCREMENT,
-                `name` varchar(255) DEFAULT NULL,
-                `author` varchar(255) DEFAULT NULL,
-                `about` text,
-                `image` text,
-                `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                PRIMARY KEY (`id`)
-              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci";
-            dbDelta( $sql );
-
-            $sql1 = "CREATE TABLE `wp_my_authors` (
-                `id` int NOT NULL AUTO_INCREMENT,
-                `name` varchar(255) DEFAULT NULL,
-                `fb_link` text,
-                `about` text,
-                `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                PRIMARY KEY (`id`)
-              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-            ";
-            dbDelta($sql1);
-
-            $sql2 = "CREATE TABLE `wp_my_students` (
-                `id` int NOT NULL AUTO_INCREMENT,
-                `name` varchar(255) DEFAULT NULL,
-                `email` text,
-                `user_login_id` int NOT NULL,
-                `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                PRIMARY KEY (`id`)
-              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-            
-            ";
-            dbDelta( $sql2 );
-
-            $sql3 = "CREATE TABLE `wp_my_enroll` (
-                `id` int NOT NULL AUTO_INCREMENT,
-                `student_id` int NOT NULL,
-                `book_id` int NOT NULL,
-                `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                PRIMARY KEY (`id`)
-              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-            ";
-            dbDelta( $sql3 );
+            include_once PLUGIN_PATH .'/db/create-db.php';
+            //Tạo role my book user khi active plugin 
+            add_role( 'wp_my_book_user', 'My Book User', array(
+                "read" => true
+            ) );
         }
-        //Xóa table khi active plugin
+        //Xóa table khi deactive plugin
         function drop_table_plugin_book() {
-            $this->wpdb->query("DROP TABLE IF EXISTS `wp_my_books`");
-            $this->wpdb->query("DROP TABLE IF EXISTS `wp_my_authors`");
-            $this->wpdb->query("DROP TABLE IF EXISTS `wp_my_students`");
-            $this->wpdb->query("DROP TABLE IF EXISTS `wp_my_enroll`");
-         
+            include_once PLUGIN_PATH . '/db/drop-db.php';  
+            //Xóa role my book user khi deactive plugin 
+            if(get_role('wp_my_book_user')) {
+                remove_role('wp_my_book_user');
+            }
+                  
         }
        
     }
@@ -179,7 +139,12 @@
     register_deactivation_hook( __FILE__, array($book,'drop_table_plugin_book' ));
 
     //AJAX call insert book 
-    require_once PLUGIN_PATH . "/inc/Ajax_new_Book.php"; 
-    add_action( 'wp_ajax_mybooklibrary', ['Ajax_new_Book', 'ajax_book_handler'] );
+    require_once PLUGIN_PATH . "/inc/Ajax_Handler.php"; 
+    //AdJAX for book
+    add_action( 'wp_ajax_mybooklibrary', ['Ajax_Handler', 'ajax_handler'] );
+    //AJAX for authors
+    add_action( 'wp_ajax_myauthor', ['Ajax_Handler', 'ajax_handler'] );
+    //AJAX for students 
+    add_action('wp_ajax_mystudent', ['Ajax_Handler', 'ajax_handler']);
  }
  

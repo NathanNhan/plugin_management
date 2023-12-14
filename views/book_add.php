@@ -22,6 +22,16 @@
                     <label for="author" class="form-label">Author</label>
                     <select name="author" id="author" class="form-control">
                         <option value="-1">-- Choose Author --</option>
+                        <?php
+                           global $wpdb; 
+                           $authors = $wpdb->get_results("SELECT * from wp_my_authors ORDER by id ASC", ARRAY_A);
+                           foreach ($authors as $key => $value) {
+                              ?>
+                                <option value="<?php echo esc_html__( $value["id"] )  ?>"><?php echo esc_html( $value['name'] )  ?></option>
+                              <?php 
+                           }
+                        
+                        ?>
                     </select>
                     
                 </div>

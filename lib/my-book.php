@@ -1,9 +1,4 @@
 <?php 
-
-class Ajax_new_Book {
-   public static function ajax_book_handler() {
-    global $wpdb;
-    parse_str($_REQUEST["data"], $newArr);
     if($newArr['param'] == "save_book") {
         $wpdb->insert('wp_my_books', array(
             'name' => $newArr['name'],
@@ -31,5 +26,3 @@ class Ajax_new_Book {
         echo json_encode(array("status" => 1, "message" => 'Book created successfully!'));
         wp_die();
     }
-   } 
-}
