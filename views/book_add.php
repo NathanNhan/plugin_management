@@ -27,7 +27,7 @@
                            $authors = $wpdb->get_results("SELECT * from wp_my_authors ORDER by id ASC", ARRAY_A);
                            foreach ($authors as $key => $value) {
                               ?>
-                                <option value="<?php echo esc_html__( $value["id"] )  ?>"><?php echo esc_html( $value['name'] )  ?></option>
+                                <option value="<?php echo esc_html($value['name']); ?>"><?php echo esc_html( $value['name'] )  ?></option>
                               <?php 
                            }
                         

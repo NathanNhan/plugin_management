@@ -2,7 +2,7 @@
     if($newArr['param'] == "save_book") {
         $wpdb->insert('wp_my_books', array(
             'name' => $newArr['name'],
-            'author' => $newArr['about'],
+            'author' => $newArr['author'],
             'about' => $newArr['about'],
             'image' => $newArr['image_value'],
         ));
@@ -12,7 +12,7 @@
     } else if ($newArr['param'] == "update_book") {
         $wpdb->update('wp_my_books', array(
             'name' => $newArr['name'],
-            'author' => $newArr['about'],
+            'author' => $newArr['author'],
             'about' => $newArr['about'],
             'image' => $newArr['image_value'],
         ), array(

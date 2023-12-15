@@ -17,6 +17,7 @@ jQuery(document).ready(function() {
         submitHandler:function() {
         
            var post_data =  "param=save_book&"+jQuery('#frmAddBook').serialize();
+           console.log(post_data);
            var data = {
             action: "mybooklibrary",
             data : post_data
@@ -29,9 +30,9 @@ jQuery(document).ready(function() {
                     html : data.message
                 });
 
-                setTimeout(() => {
-                    location.reload();
-                }, 3000);
+                // setTimeout(() => {
+                //     location.reload();
+                // }, 3000);
             }
            })
 
@@ -153,7 +154,31 @@ jQuery(document).ready(function() {
     })
 
 
-    //List student
+    //Courses Tracking
+    jQuery(document).on("click",".owl-button",function(e) {
+        var user_id = e.target.nextElementSibling.value;
+        var book_id  =e.target.nextElementSibling.nextElementSibling.value;
+        var data_course = "param=add_course&studentid="+user_id+"&bookid="+book_id;
+        var data = {
+            action : 'mycourse',
+            data: data_course
+        }
+        jQuery.post(mybookajaxurl.baseURL, data, function(response) {
+            var data = jQuery.parseJSON(response);
+            if(data.status == 1) {
+                jQuery.notifyBar({
+                    cssClass: "success",
+                    html : data.message
+                });
+                
+                setTimeout(() => {
+                    location.reload();
+                }, 3000);
+               
+            }
+           })
 
+    })
+    
 
 })

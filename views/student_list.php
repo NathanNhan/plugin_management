@@ -7,9 +7,6 @@ $all_students = $wpdb->get_results("SELECT * from wp_my_students ORDER by id DES
 // print_r($all_books);
 
 ?>
-
-
-
 <div class="container-fluid">
     <div class="row">
         <div class="alert alert-info">My Student List</div>
@@ -45,8 +42,6 @@ $all_students = $wpdb->get_results("SELECT * from wp_my_students ORDER by id DES
                             <a class="btn btn-danger btn_book_delete"  href="javascript:void(0)" data-id="<?php echo $value['id']; ?>">Delete</button>
                         </td>
                     </tr>
-
-
                     <?php 
                 }
                }

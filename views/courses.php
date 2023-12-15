@@ -2,7 +2,7 @@
 //get all book 
 global $wpdb; 
 
-$all_books = $wpdb->get_results("SELECT * from wp_my_enroll ORDER by id DESC", ARRAY_A);
+$all_course = $wpdb->get_results("SELECT * from wp_my_enroll ORDER by id DESC", ARRAY_A);
 
 // print_r($all_books);
 
@@ -20,27 +20,28 @@ $all_books = $wpdb->get_results("SELECT * from wp_my_enroll ORDER by id DESC", A
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Course</th>
+                <th>Student ID</th>
+                <th>Book ID</th>
                 <th>Created At</th>
+                <th>Action</th>
             </tr>
         </thead>
-        <!-- <tbody>
+         <tbody>
             <?php 
-               if(count($all_books) > 0) {
+               if(count($all_course) > 0) {
                 $i = 1; 
-                foreach($all_books as $key => $value) {
+                foreach($all_course as $key => $value) {
                     ?>
 
                     <tr>
                         <td><?php  echo $i++ ?></td>
-                        <td><?php echo $value['name'] ?></td>
-                        <td><?php  echo$value['author'] ?></td>
-                        <td><?php echo $value['about'] ?></td>
+                        <td><?php echo $value['student_id'] ?></td>
+                        <td><?php  echo$value['book_id'] ?></td>
+
                         <td><?php  echo$value['created_at'] ?></td>
-                        <td><img src='<?php  echo$value['image'] ?>' width="80" height="80" /></td>
+
                         <td>
-                            <a class="btn btn-info m-3" href="http://web1.test/wp-admin/admin.php?page=edit-book&edit=<?php echo $value['id']; ?>">Edit</button>
+
                             <a class="btn btn-danger btn_book_delete"  href="javascript:void(0)" data-id="<?php echo $value['id']; ?>">Delete</button>
                         </td>
                     </tr>
@@ -52,7 +53,7 @@ $all_books = $wpdb->get_results("SELECT * from wp_my_enroll ORDER by id DESC", A
             
             ?>
             
-        </tbody> -->
+        </tbody> 
        
     </table>
         </div>

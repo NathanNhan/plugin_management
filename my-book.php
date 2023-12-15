@@ -31,14 +31,32 @@
             global $wpdb;
             $this->wpdb = $wpdb;
             //Hook chạy hàm load_assets vào hook wp_enqueue_scripts
+            add_action('wp_enqueue_scripts', array($this, 'load_assets'));
             add_action('admin_enqueue_scripts', array($this, 'load_assets'));
             //Khởi tạo menu in admin
             add_action('admin_menu', array($this, 'mybook_setting'));
+            //Shortcode book content page 
+            add_shortcode( 'book_page', array($this, 'my_book_content') );
+            //Create my book template
+            add_filter('page_template',array($this, 'owt_custom_page_layout'));
+            //login redirect
+            add_filter('login_redirect', array($this, 'owt_login_user_role_filter'), 10, 3);
+            //logout redirect
+            add_filter('wp_logout', array($this, 'owt_logout_user_role_filter'));
         }
         //Nhúng thư viện scripts và css
         function load_assets() {
-            $pages_include = array('list-book','add-book','edit-book','list-authors','add-author','list-students','add-student','course-tracker');
+            $pages_include = array('frontendpage','list-book','add-book','edit-book','list-authors','add-author','list-students','add-student','course-tracker');
             $currentPage = isset($_GET['page']);
+
+
+            //Kiểm tra và gán giá trị cho biến current Page
+            if(empty($currentPage)) {
+                $actualLink = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+                if(preg_match("/my_book/", $actualLink)) {
+                    $currentPage = "frontendpage";
+                }
+            }
 
             if(in_array($currentPage, $pages_include)) {
                 wp_enqueue_style( 'bootstrap', PLUGIN_URL.'css/bootstrap.min.css', '', VERSION, 'all' );
@@ -118,6 +136,18 @@
             add_role( 'wp_my_book_user', 'My Book User', array(
                 "read" => true
             ) );
+            //Dynamic page creation code - listing of created books 
+            //Create post object
+            $my_post = array (
+                'post_title' => "Book Page",
+                'post_content' => "[book_page]",
+                'post_status' => "publish",
+                "post_type" => "page",
+                "post_name" => "my_book"
+            );
+            //Insert book page into the database 
+            $book_id = wp_insert_post( $my_post );
+            update_option("my_book_page_id", $book_id);
         }
         //Xóa table khi deactive plugin
         function drop_table_plugin_book() {
@@ -125,10 +155,52 @@
             //Xóa role my book user khi deactive plugin 
             if(get_role('wp_my_book_user')) {
                 remove_role('wp_my_book_user');
+            }//delete password
+            if(!empty(get_option("my_book_page_id"))) {
+                $book_page = get_option("my_book_page_id");
+                wp_delete_post( $book_page,true );
+                delete_option( "my_book_page_id" );
             }
                   
         }
-       
+
+        //Hiển thị layout cho trang book content == shortcode
+        function my_book_content() {
+            include_once PLUGIN_PATH .'/views/frontend-listing-book.php';
+        }
+
+
+        function owt_custom_page_layout($page_template) {
+            global $post;
+            $page_slug = $post->post_name;
+            if($page_slug=="my_book") {
+               $page_template = PLUGIN_PATH .'/views/frontend-book-template.php';
+            }
+            return $page_template;
+        }
+
+        //redirect my book when user login with role == my book 
+        function owt_login_user_role_filter($redirect_to, $request, $user) {
+           //is there a user to check?
+	        if ( isset( $user->roles ) && is_array( $user->roles ) ) {
+		    //check for admins
+                if ( in_array( 'wp_my_book_user', $user->roles ) ) {
+                    // redirect them to the default place
+                    return $redirect_to . "/my_book";
+                } else {
+                    return $redirect_to;
+                }
+                
+            } else {
+                return $redirect_to;
+            }
+        }
+
+        //logout redirect
+        function owt_logout_user_role_filter() {
+            wp_redirect( site_url()."/my_book" );
+            exit();
+        }
     }
     //Khởi tạo đối tượng book từ class MyBook
     $book = new MyBook();
@@ -146,5 +218,9 @@
     add_action( 'wp_ajax_myauthor', ['Ajax_Handler', 'ajax_handler'] );
     //AJAX for students 
     add_action('wp_ajax_mystudent', ['Ajax_Handler', 'ajax_handler']);
+    //AJAX for course tracking
+    add_action('wp_ajax_mycourse', ['Ajax_Handler', 'ajax_handler']);
+
+    
  }
  

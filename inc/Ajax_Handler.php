@@ -10,5 +10,8 @@ class Ajax_Handler {
     include_once PLUGIN_PATH . "/lib/my-author.php";
     //Handle CRUD for my students 
     include_once PLUGIN_PATH . "/lib/my-student.php";
+    //Create template for front end book listing 
+    
+    include_once PLUGIN_PATH . "/lib/my-course.php";
    } 
 }
